@@ -1,0 +1,102 @@
+<% include ./partials/header %>
+	<link  rel="stylesheet" href="/css/font-awesome.css" />
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" /></a>
+					<ul class="nav">
+						<li class="active"><a href="my-account"><i><img src="images/user.png" alt="" /></i>My Account</a></li>
+						<li><a href="buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a></li>
+						<li><a href="send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a></li>
+						<li><a href="statement"><i><img src="images/statement.png" alt="" /></i>Statement</a></li>
+						<li><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+				<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+	<div class="main">
+		<div class="wrap">
+
+			<div class="mt-60">
+			<div id="leftCol">
+				<div class="accDetails">
+					<h3>Account Details</h3>
+
+					<div class="temp_list">
+						<ul>
+							<li>Account<button class="float-rt" style="margin-left:10px; color:#fff; background: transparent;border:none;" id="copybutton" data-clipboard-text="<%=session.public%>"><i class="fa fa-paste"></i></button>
+								<label class="digits" id="digits"><%=session.public%></label>
+								<div class="clear"></div>
+							</li>
+							<li>
+								Your XDC Account Balance
+								<label class="digits" id="accountBal"></label>
+								<div class="clear"></div>
+							</li>
+
+							<li>
+								Total Value in US $
+								<label class="digits" id="accountBalDollars"></label><br>
+								<small>* Actual Conversion Value Might be slightly different</small><br>
+								<h3>XinFin XDC Pre ICO sale has ended. Thank you for making it a great success. Allow us a few days to set up our ICO and the required deliverables.</h3>
+								<h3>Please DO NOT Transfer any ETH from your ether wallet directly to XinFin Address. Ether once lost, can not be recovered.</h3>
+								<h3>If you are looking to support XinFin before ICO opens, please write to us at info@xinfin.org</h3>
+								
+								<div class="clear"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+
+			<div id="rightCol" class="mb-60">
+				<div class="priceBox">
+					<h3>Todays XDC Price<br>
+					0.0004 US $</h3>
+				</div>
+			</div>
+
+		</div>
+
+
+			<div class="clear"></div>
+		</div>
+	</div>
+	<script src="/js/ZeroClipboard.min.js"></script>
+	<script src="/js/axios.min.js"></script>
+	<script>
+		axios.post('/api/balance', {
+			address: '<%=session.public%>',
+		})
+		.then(function (response) {
+			document.getElementById('accountBal').innerHTML = response.data.balance;
+			document.getElementById('accountBalDollars').innerHTML = parseFloat((parseFloat(response.data.balance) * 0.0004).toPrecision(12)) + '*';
+		})
+		.catch(function (response) {
+			console.log(response);
+		});
+var client = new ZeroClipboard( document.getElementById("copybutton") );
+
+client.on( "ready", function( readyEvent ) {
+  // alert( "ZeroClipboard SWF is ready!" );
+
+  client.on( "aftercopy", function( event ) {
+    // `this` === `client`
+    // `event.target` === the element that was clicked
+    event.target.style.display = "none";
+    // alert("Copied text to clipboard: " + event.data["text/plain"] );
+  } );
+} );
+</script>
+
+<% include ./partials/footer %>

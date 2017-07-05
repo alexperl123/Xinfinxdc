@@ -1,0 +1,15 @@
+<% include ./partials/header %>
+<h1>Token Wallet</h1>
+<form class="transfer form-inline">
+	<div class="form-group">
+		<input type="text" placeholder="transfer to" class="form-control" id="addressTo">
+	</div>
+	<div class="form-group">
+		<input type="text" placeholder="value" class="form-control" id="value">
+	</div>
+	<button type='button' class="btn btn-info" onclick="transferToken()">Submit</button>
+</form>
+
+<span>Balance : </span><span id="balance"></span>
+
+<% include ./partials/footer %>

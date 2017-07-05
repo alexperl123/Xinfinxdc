@@ -1,0 +1,80 @@
+<% include ./partials/header %>
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/my-account"><i><img src="images/user.png" alt="" /></i>My Account</a>
+						</li>
+						<li><a href="/buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a>
+						</li>
+						<li><a href="/send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a>
+						</li>
+						<li><a href="/statement"><i><img src="images/statement.png" alt="" /></i>Statement</a>
+						</li>
+						<li class="active"><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="main">
+		<div class="wrap">
+
+			<div class="middleCol mt-60">
+
+				<div class="column_right_grid">
+					<div class="login-block">
+						<form id="signUp-form" class="requestXdc-form mt-30" onsubmit="support(); return false;">
+							<input type="text" value="" placeholder="Contact Email" class="min-padd" name="email" required/>
+							<textarea cols="5" rows="5" placeholder="Support Request detail" class="min-padd" name="query" required/></textarea>
+							<span id="mainCaptcha" style="display: block; text-align: left; color: #aaa; background: #50597b; border: 1px solid #333; padding: 10px; margin-bottom: 10px; border-radius: 5px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; "></span>
+							<input type="text" name="txtInput" id="txtInput" class="min-padd" placeholder="Enter text written above" required>
+							<input type="submit" id="my_submit" class="" value="Submit" />
+						</form>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="/js/axios.min.js"></script>
+	<script src="/js/captcha.js"></script>
+
+	<script>
+	support = function() {
+		if(ValidCaptcha()) {
+			$('#my_submit').attr('disabled',true)
+			axios.post('/api/support', {
+				email: document.forms['signUp-form'].email.value,
+				query: document.forms['signUp-form'].query.value,
+			})
+			.then(function (response) {
+				if(response.data.status == 'SUCCESS') {
+					$('.login-block').html(`${response.data.message}`);
+				} else {
+					$('.login-block').html(`${response.data.message}`);
+				}
+			})
+		} else {
+			alert('Invalid Captcha!');
+		}
+	}
+	</script>
+
+
+<% include ./partials/footer %>

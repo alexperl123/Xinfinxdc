@@ -1,0 +1,106 @@
+<% include ./partials/header %>
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/my-account"><i><img src="images/user.png" alt="" /></i>My Account</a>
+						</li>
+						<li class="active"><a href="/buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a>
+						</li>
+						<li><a href="/send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a>
+						</li>
+						<li><a href="/statement"><i><img src="images/statement.png" alt="" /></i>Statement</a>
+						</li>
+						<li><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+	<div class="main">
+		<div class="wrap">
+
+			<div class="mt-60">
+				<div id="leftCol">
+					<div class="column_right_grid">
+						<div class="login-block">
+								<h3>XinFin XDC Pre ICO sale has ended. Thank you for making it a great success. Allow us a few days to set up our ICO and the required deliverables.</h3>
+								<h3>Please DO NOT Transfer any ETH from your ether wallet directly to XinFin Address. Ether once lost, can not be recovered.</h3>
+								<h3>If you are looking to support XinFin before ICO opens, please write to us at info@xinfin.org</h3>
+							<!--<h3>Buy XDC</h3>
+							<form id="signUp-form" class="requestXdc-form mt-30" method="POST" action="/api/buy" name="sendxdc">
+								<input type="number" value="" placeholder="Request XDC Nos" class="min-padd" name="xdcnos" min="1000" step="0.000001"/>
+								<small>Pay with :</small>
+								<input type="radio" value="BTC" name="currency" checked> BTC
+								<input type="radio" value="ETH" name="currency"> ETH <br>
+								<input type="submit" id="my_submit" class="" value="Buy XDC" />
+							</form>-->
+						</div>
+						<div id="payment-block" class="login-block" style="text-align:left; color:#888">
+						</div>
+					</div>
+				</div>
+
+
+				<div id="rightCol" class="mb-60">
+				<div class="priceBox">
+					<h3>Todays XDC Price<br>0.0004 US $</h3>
+				</div>
+				</div>
+
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="/js/axios.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			$('#signUp-form').on('submit', function(e) {
+				e.preventDefault();
+				if(!isNaN(parseFloat(document.forms['sendxdc'].xdcnos.value) && parseFloat(document.forms['sendxdc'].xdcnos.value) > 1000)){
+					$('#my_submit').attr('disabled', true);
+					axios.post('/api/buy', {
+						xdcnos: document.forms['sendxdc'].xdcnos.value,
+						currency: document.forms['sendxdc'].currency.value
+					})
+					.then(function (response) {
+						data = response.data.data;
+						if(document.forms['sendxdc'].currency.value == "BTC") {
+							console.log(`bitcoin:${data.address}?amount=${data.amount}`)
+						} else {
+							console.log(data.address)
+						}
+
+						if(response.data.status=="SUCCESS" && data){
+							$('.priceBox').html(`<img src="${data.qrcode_url}"><p style="color:#888;">Scan this QR Code with your favourite ${(response.data.currency == 'BTC')?'BitCoin':'Ether'} Wallet to make payment. </p>`);
+							$('#payment-block').html(`
+								<table class="min-padd">
+								<tr><td>Address</td><td class="text-cyan"> ${data.address}</td></tr>
+								<tr><td>Amount </td><td class="text-cyan"> ${response.data.currency} ${data.amount} (equivalent to USD ${response.data.dollars})</td></tr>
+								<tr><td colspan="2">Review you payment status <a href="${data.status_url}" target="_blank" style="color: #ccc">here</a>.</td></tr>
+								</table>`);
+						} else {
+							alert(response.data.message)
+						}
+					});
+				} else {
+					alert('XDC should be greated than 1000.')
+				}
+			})
+		});
+	</script>
+
+<% include ./partials/footer %>

@@ -1,0 +1,174 @@
+<% include ./partials/header %>
+
+<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/my-account"><i><img src="images/user.png" alt="" /></i>My Account</a>
+						</li>
+						<li><a href="/buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a>
+						</li>
+						<li class="active"><a href="/send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a>
+						</li>
+						<li><a href="/statement"><i><img src="images/statement.png" alt="" /></i>Statement</a>
+						</li>
+						<li><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+	<div class="main">
+		<div class="wrap">
+
+			<div class="mt-60">
+				<div id="leftCol">
+					<div class="column_right_grid">
+						<div class="login-block">
+							<h3>Send XDC</h3>
+							<form id="signUp-form" class="sendXdc-form mt-30" name="sendxdc">
+								<input type="number" min="0" step="0.0001" value="" placeholder="Send XDC Nos" class="min-padd" name="xdc" required>
+								<input type="text" value="" placeholder="Receiver Account" class="min-padd" name="account" required />
+								<input type="submit" id="my_submit" class="" value="Send XDC" /><br>
+								<span id="loader"></span>
+							</form>
+						</div>
+								<p><h3>XinFin XDC Pre ICO sale has ended. Thank you for making it a great success. Allow us a few days to set up our ICO and the required deliverables.</h3></p><br>
+								<p><h4 style="color:red;">Please DO NOT Transfer any ETH from your ether wallet directly to XinFin Address. Ether once lost, can not be recovered.</h3></p><br>
+								<p><h3>If you are looking to support XinFin before ICO opens, please write to us at info@xinfin.org</h3></p>
+					</div>
+				</div>
+
+				<div id="rightCol" class="mb-60">
+					<div class="priceBox">
+						<h3>Your XDC Nos<br> <span id="accountBal"></span></h3>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="/js/axios.min.js"></script>
+	<script>
+		var BALANCE = 0;
+		balance = function() {
+			axios.post('/api/balance', {
+				address: '<%=session.public%>',
+			})
+			.then(function (response) {
+			
+				BALANCE = parseFloat(response.data.balance);
+				document.getElementById('accountBal').innerHTML = response.data.balance;
+			});
+			// Set values from querystring for edit
+			if (typeof GetParameterValues('xdc') !== 'undefined')
+			{
+				document.forms['sendxdc'].xdc.value = GetParameterValues('xdc');
+				document.forms['sendxdc'].account.value = GetParameterValues('account');
+			}
+		}
+
+		$(document).ready(function(){
+			
+			$('#signUp-form').on('submit', function(e) {
+				e.preventDefault();
+				if(document.forms['sendxdc'].account.value == '<%=session.public%>'){
+					$('#loader').html(`Can't transfer to self.`);
+					return;
+				}
+				if (Number(document.forms['sendxdc'].xdc.value) < 1000)
+				{
+					$('#loader').html(`Can't transfer less than 1000 .`);
+					return;
+				}
+				if(BALANCE >= document.forms['sendxdc'].xdc.value) 
+				{
+				    $('#loader').html('Pending...')
+					$('#my_submit').attr('disabled', true);
+
+					// verify receiver account. 	
+					axios.post('/api/verifyxdcaddress', {
+							account: document.forms['sendxdc'].account.value.toLowerCase().trim(),
+							xdc: document.forms['sendxdc'].xdc.value,
+						})
+						.then(function (response) {
+							if(response.data.status == 'FAILED')
+							{							
+								$('#loader').html(response.data.message);
+								$('#my_submit').removeAttr('disabled');
+								return;
+							}
+							else
+							{
+								
+								//New OTP Generate and send mail to user
+								axios.post('/api/otp', {
+									address: '<%=session.public%>',  // Sender Account address
+									email: '<%=session.email%>',     // Sender Email
+									account: document.forms['sendxdc'].account.value.toLowerCase().trim(), // Receiver Account
+									xdc: document.forms['sendxdc'].xdc.value,  // Receiver XDC amount
+									})
+									.then(function (response,res) {
+										if(response.data.status == 'SUCCESS')
+										{
+											var redURL = window.location.protocol + "//" + window.location.host;
+											window.location.replace(redURL + '/send-xdcconfirm');
+										}
+										if(response.data.status == 'FAILED')
+										{						
+											$('#loader').html(response.data.message);
+											$('#my_submit').removeAttr('disabled');
+										}
+											
+									});	
+								//End New OTP Generate and send mail to user
+							}
+						});	
+					// End verify receiver account	
+					
+					
+				} 
+				else 
+				{
+					$('#loader').html('Not enough balance.');
+				}
+			})
+		});
+
+		
+		load_transaction = function(){
+			axios.get('/api/transactions').then(function (response){
+				if(response.data.data.length > 0){
+				html = `<h3>Transaction Successful</h3><p style="word-wrap:break-word;">Your Transaction ID is <br><br>${response.data.data[0].tx}`;
+					$('.login-block').html(html);
+				}
+			});
+		}
+		balance();
+       
+	    function GetParameterValues(param) {  
+            var url = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');  
+            for (var i = 0; i < url.length; i++) {  
+                var urlparam = url[i].split('=');  
+                if (urlparam[0] == param) {  
+                    return urlparam[1];  
+                }  
+            }  
+        }   
+		
+	</script>
+
+<% include ./partials/footer %>

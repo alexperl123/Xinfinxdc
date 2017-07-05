@@ -1,0 +1,26 @@
+<div class="profile_details">
+	<div id="loginContainer">
+		<a id="loginButton" class=""><span><%=session.email%></span></a>
+		<div id="loginBox">
+			<form id="loginForm" style="min-width: 200px;">
+				<fieldset id="body">
+					<div class="user-info">
+						<h4>Hello,<a href="#"> <%=session.email%></a></h4>
+						<ul>
+							<li class="profile active"><a href="/user-logged">Profile </a>
+							</li>
+							<li class="logout"><a href="/logout"> Logout</a>
+							</li>
+							<div class="clear"></div>
+						</ul>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	<div class="profile_img">
+		<a href="#"><img src="images/profile_img40x40.jpg" alt="" /> </a>
+	</div>
+	<div class="clear"></div>
+</div>
+<div class="clear"></div>

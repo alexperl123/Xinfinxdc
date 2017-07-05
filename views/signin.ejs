@@ -1,0 +1,76 @@
+<% include ./partials/header %>
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/"><i><img src="images/home.png" alt="" /></i>Home</a>
+						</li>
+						<li class="active"><a href="/signin"><i><img src="images/lock.png" alt="" /></i>Sign In</a>
+						</li>
+						<li><a href="/contact-us"><i><img src="images/contact.png" alt="" /></i>Contact Us</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+
+				<div class="clear"></div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="main">
+		<div class="wrap">
+
+			<div class="middleCol mt-60">
+
+				<div class="column_right_grid">
+					<div class="login-block">
+						<h3>Sign In to your Ewallet</h3>
+						<form id="signUp-form" name="signin-form" class="signUp-form mt-30" onsubmit="signin(); return false;">
+							<input type="text" value="" placeholder="Email" name="username" />
+							<input type="password" value="" placeholder="Password" name="password" />
+							<input type="submit" id="my_submit" class="" value="Sign In" />
+						</form>
+						<h4><a href="/forgot">Forgot/Reset Password?</a></h4><br>
+						<h3>XinFin XDC Pre ICO sale has ended. Thank you for making it a great success. Allow us a few days to set up our ICO and the required deliverables.</h3>
+						<h3>Please DO NOT Transfer any ETH from your ether wallet directly to XinFin Address. Ether once lost, can not be recovered.</h3>
+						<h3>If you are looking to support XinFin before ICO opens, please write to us at info@xinfin.org</h3>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="/js/axios.min.js"></script>
+	<script>
+	signin = function() {
+
+		axios.post('/api/signin', {
+			username: document.forms['signUp-form'].username.value,
+			password: document.forms['signUp-form'].password.value
+		})
+		.then(function (response) {
+			if(response.data.status == 'SUCCESS' && response.data.isLogged) {
+				location.replace('/my-account');
+			} else {
+				alert('Failed login attempt')
+			}
+		})
+		.catch(function (response) {
+			console.log(response);
+		});
+	}
+	</script>
+
+<% include ./partials/footer %>

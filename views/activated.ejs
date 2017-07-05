@@ -1,0 +1,67 @@
+<% include ./partials/header %>
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li class="active"><a href="/"><i><img src="images/home.png" alt="" /></i>Home</a>
+						</li>
+						<li><a href="/signin"><i><img src="images/lock.png" alt="" /></i>Sign In</a>
+						</li>
+						<li><a href="/contact-us"><i><img src="images/contact.png" alt="" /></i>Contact Us</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+
+				<div class="clear"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="main">
+		<div class="wrap">
+
+			<div class="welcome-text">
+				<h1>Welcome to XDC official Wallet.</h1>
+				<h2>Secure and easiest way to Store XDC.</h2>
+			</div>
+
+			<div class="middleCol">
+
+				<div class="column_right_grid">
+					<div class="login-block">
+						<p>Account successfully activated. Please <button onclick="location.replace('/signin')">Login</button></p>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script>
+	register = function() {
+
+		axios.post('/api/account/create', {
+			email: document.forms['register-form'].username.value,
+			phone: document.forms['register-form'].mobile.value,
+			password: document.forms['signUp-form'].password.value
+		})
+		.then(function (response) {
+			$('.login-block').html(`<p>Successfully registered. Account activation link has been sent to your ${document.forms['register-form'].username.value} email. Please activate your account and sign in to your wallet.</p>`)
+			//location.replace('/signin')
+		})
+		.catch(function (response) {
+			console.log(response);
+		});
+	}
+	</script>
+<% include ./partials/footer %>

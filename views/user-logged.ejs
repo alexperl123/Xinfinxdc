@@ -1,0 +1,73 @@
+<% include ./partials/header %>
+
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/my-account"><i><img src="images/user.png" alt="" /></i>My Account</a>
+						</li>
+						<li><a href="/buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a>
+						</li>
+						<li><a href="/send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a>
+						</li>
+						<li><a href="/statement"><i><img src="images/statement.png" alt="" /></i>Statement</a>
+						</li>
+						<li><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+	<div class="main">
+		<div class="wrap">
+
+			<div class="middleCol mt-60">
+
+				<div class="column_right_grid accDetails pt-0">
+					<h3>Your Account Details</h3>
+
+					<div class="temp_list">
+						<ul id="p1">
+							<li>
+								Your Account No.
+								<label class="digits"><%=session.public%></label>
+								<div class="clear"></div>
+							</li>
+
+							<li>
+								Email
+								<label class="digits lowerCase"><%=session.email%></label>
+								<div class="clear"></div>
+							</li>
+
+							<li>
+								Mobile No.
+								<label class="digits"><%=session.mobile%></label>
+								<div class="clear"></div>
+							</li>
+							<li><h3>XinFin XDC Pre ICO sale has ended. Thank you for making it a great success. Allow us a few days to set up our ICO and the required deliverables.</h3>
+								<h3>Please DO NOT Transfer any ETH from your ether wallet directly to XinFin Address. Ether once lost, can not be recovered.</h3>
+								<h3>If you are looking to support XinFin before ICO opens, please write to us at info@xinfin.org</h3>
+							</li>
+						</ul>
+					</div>
+
+
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+
+<% include ./partials/footer %>

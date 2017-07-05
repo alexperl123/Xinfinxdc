@@ -1,0 +1,114 @@
+<% include ./partials/header %>
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/my-account"><i><img src="images/user.png" alt="" /></i>My Account</a>
+						</li>
+						<li><a href="/buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a>
+						</li>
+						<li><a href="/send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a>
+						</li>
+						<li class="active"><a href="/statement"><i><img src="images/statement.png" alt="" /></i>Statement</a>
+						</li>
+						<li><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+
+
+
+	<div class="main">
+		<div class="wrap">
+
+			<div class="mt-60">
+
+				<div class="column_right_grid">
+					<div class="login-block">
+						<h3>Transaction Details</h3>
+						<table id="table" class="mt-40">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Description</th>
+									<th>Type</th>
+									<th>Nos. XDC</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+
+						<div class="pagination">
+							<div>Page: <span id="current">0</span>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="/js/axios.min.js"></script>
+	<script>
+		var page = 1, transactions, perpage = 20;
+		axios.get('/api/transactions')
+		.then(function (response) {
+			html = '';
+			transactions = response.data.data;
+			console.log(transactions.length)
+			pageHtml = ''
+			tot = (transactions.length / perpage );
+			tot = ((transactions.length % perpage) > 0 )?tot+1:tot;
+			for(p=1;p<=tot;p++) {
+				pageHtml += `<button onclick="page=${p};fillTransactions();">${p}</button>`
+			}
+			$('.pagination').append('<div id="pages">'+pageHtml+'</div>');
+			document.querySelector('#pages').innerHTML = pageHtml;
+
+			fillTransactions();
+		})
+		.catch(function (response) {
+			console.log(response);
+		});
+
+		fillTransactions = function() {
+			document.getElementById('current').innerHTML = page
+			min = (page - 1) * perpage;
+			max = min + perpage;
+			html = '';
+			transactions.forEach(function(tx, i){
+
+				if(i >= min && i < max) {
+					html += `<tr>
+						<td>${moment(tx.time).format('DD MMM YYYY')}<br>${moment(tx.time).fromNow()}</td>
+						<td>
+						${(tx.from == '<%=session.public%>')?'To: '+tx.to:'From: '+tx.from}
+						<br>TxID: ${tx.transactionHash}</td>
+						<td>${(tx.from == '<%=session.public%>')?'DEBIT':'CREDIT'}</td>
+						<td>${tx.value}</td>
+						</tr>`;
+				}
+			})
+			document.querySelector('#table tbody').innerHTML = html;
+		}
+	</script>
+
+<% include ./partials/footer %>

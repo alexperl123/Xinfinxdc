@@ -1,0 +1,285 @@
+<% include ./partials/header %>
+
+	
+<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/my-account"><i><img src="images/user.png" alt="" /></i>My Account</a>
+						</li>
+						<li><a href="/buy-xdc"><i><img src="images/buy-xdc.png" alt="" /></i>Buy XDC</a>
+						</li>
+						<li class="active"><a href="/send-xdc"><i><img src="images/send-xdc.png" alt="" /></i>Send XDC</a>
+						</li>
+						<li><a href="/statement"><i><img src="images/statement.png" alt="" /></i>Statement</a>
+						</li>
+						<li><a href="/support"><i><img src="images/support.png" alt="" /></i>Support</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="js/responsive-nav.js"></script>
+				</div>
+
+				<% include ./partials/profile %>
+
+			</div>
+		</div>
+	</div>
+
+
+	<div class="main">
+		<div class="wrap">
+
+			<div class="mt-60">
+				<div id="leftCol">
+					<div class="column_right_grid">
+						<div class="login-block">
+							<h3>Send XDC - Confirm OTP</h3>
+							<form id="OTPConfirm-form" class="sendXdc-form mt-30" name="sendxdc">
+								<div class="temp_list">
+										<ul>
+											<li>
+												Send XDC Nos
+												<label class="digits" id="sendxdc"></label>
+												<div class="clear"></div>
+											</li>
+											<li>
+												Receiver Account
+												<label class="digits" id="ReceiverAccount"></label>
+												<div class="clear"></div>
+											</li>
+									     </ul>
+								</div>
+								
+							    <input type="number"  placeholder="OTP No" maxlength="4"  size="4" value=""  name="OTPNo" required>
+								<!--<span id="spnbtn">
+								<button type="button" onclick="EditCanOTP()"  id="Edit"   style="float:left;">Edit</button>
+								<button type="button" onclick="RegOTP()"  id="regotp"  style="float:left;;margin-left:10px;">Regenerate OTP</button>
+								</span>-->
+								<input type="submit" id="my_submit" class="" value="Confirm OTP" style="float:right;"  />
+								<a href="#" onclick="RegOTP()"  id="regotp" class="smallBtn" style="float:right;margin-right: 25px;" >Regenerate OTP</a>
+								<a href="#" onclick="EditCanOTP()" id="Edit" class="smallBtn" style="float:right;" >Edit</a>
+								<br><br><br><br>
+								<span id="loader"></span>
+							</form>
+						</div>
+
+					</div>
+				</div>
+
+				<div id="rightCol" class="mb-60">
+					<div class="priceBox">
+						<h3>Your XDC Nos<br> <span id="accountBal"></span></h3>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="/js/axios.min.js"></script>
+	<script>
+		// Get Balance
+		var BALANCE = 0;
+		balance = function() {
+			axios.post('/api/balance', {
+				address: '<%=session.public%>',
+			})
+			.then(function (response) {
+				BALANCE = parseFloat(response.data.balance);
+				document.getElementById('accountBal').innerHTML = response.data.balance;
+			});
+		}
+        
+		// Get Pending OTP Details
+		var SendXDCNos = '';
+		var ReceiverAccount = '';
+		// Get OTP related details and showing on page
+		getotp = function() {
+			axios.post('/api/getotp', {
+				address: '<%=session.public%>',
+			})
+			.then(function (response) {
+				if (typeof response.data.xdc === "undefined") {
+					$('#loader').html('Not valid request. Please try once again from Send XDC.');
+					$('#my_submit').attr('disabled', true);	
+					//$('#Edit').attr('disabled', true);
+					$('#regotp').addClass('disabledAnchor');
+					$('#Edit').addClass('disabledAnchor');
+					return;
+				}
+				document.getElementById('sendxdc').innerHTML = response.data.xdc;
+				document.getElementById('ReceiverAccount').innerHTML = response.data.account;
+			});
+		}
+
+	$(document).ready(function(){
+			$('#OTPConfirm-form').on('submit', function(e) {
+					e.preventDefault();
+					var sendxdc = document.getElementById('sendxdc').innerHTML.trim();
+					var ReceiverAccount = document.getElementById('ReceiverAccount').innerHTML.trim();
+					if(BALANCE >= sendxdc) 
+					{
+					  	$('#loader').html('Pending...')
+						$('#my_submit').attr('disabled', true);
+						//$('#regotp').attr('disabled', true);	
+						//$('#Edit').addClass('disabledAnchor');
+						$('#regotp').addClass('disabledAnchor');
+					    $('#Edit').addClass('disabledAnchor');
+						// Verify OTP as entered by user
+						axios.post('/api/verifyotp', {
+							address: '<%=session.public%>',  
+							OTP: document.forms['sendxdc'].OTPNo.value.trim(),     
+							})
+							.then(function (response,res) {
+								if(response.data.status == 'SUCCESS')
+								{
+									//if successfully verifed then Send XDC transfer process
+										axios.post('/api/sendxdc', {
+											xdc: sendxdc,
+											account: ReceiverAccount,
+												})
+												.then(function (response) {
+													if(response.data.status == 'SUCCESS') {
+														$('#loader').html('Success.')
+														balance();
+														load_transaction();
+													}
+													else {
+														$('#loader').html(response.data.message);
+														$('#my_submit').removeAttr('disabled');
+														$('#regotp').addClass('disabledAnchor');
+					    								$('#Edit').addClass('disabledAnchor');
+														
+													}
+													
+												});
+									//End if successfully verifed then Send XDC transfer process
+								}
+								if(response.data.status == 'FAILED')
+								{							
+									$('#loader').html(response.data.message);
+									$('#my_submit').removeAttr('disabled');
+									$('#regotp').addClass('enabledAnchor');
+					    		    $('#Edit').addClass('enabledAnchor');
+								}
+									
+							});
+						// End Verify OTP as entered by user
+					}
+					else 
+				   {
+						$('#loader').html('Not enough balance.');
+				    }
+			});
+		});
+
+	   // Call this function on Regenerate OTP button click
+       function RegOTP()
+	   {
+			// Regenerate OTP
+						$('#loader').html('Pending...');
+						$('#my_submit').attr('disabled', true);
+						//$('#regotp').attr('disabled', true);
+						//$('#Edit').attr('disabled', true);
+						$('#regotp').addClass('disabledAnchor');
+					    $('#Edit').addClass('disabledAnchor');
+				        var sendxdc = document.getElementById('sendxdc').innerHTML.trim();
+					    var ReceiverAccount = document.getElementById('ReceiverAccount').innerHTML.trim();
+						axios.post('/api/regenerateotp', {
+							address: '<%=session.public%>',
+							email: '<%=session.email%>',     
+							xdc: sendxdc,
+							account: ReceiverAccount,
+							})
+							.then(function (response,res) {
+								if(response.data.status == 'SUCCESS')
+								{
+									$('#loader').html(response.data.message);
+								}
+								if(response.data.status == 'FAILED')
+								{						
+									$('#loader').html(response.data.message);
+								}
+								
+							});	
+							$('#my_submit').removeAttr('disabled');
+							// $('#regotp').removeAttr('disabled');
+							// $('#Edit').removeAttr('disabled');
+							$('#regotp').addClass('enabledAnchor');
+					    	$('#Edit').addClass('enabledAnchor');
+						// Regenerate OTP
+	   } 
+
+		load_transaction = function(){
+			axios.get('/api/transactions').then(function (response){
+				if(response.data.data.length > 0){
+				html = `<h3>Transaction Successful</h3><p style="word-wrap:break-word;">Your Transaction ID is <br><br>${response.data.data[0].tx}`;
+					$('.login-block').html(html);
+				}
+			});
+		}
+      // Call this function on Edit button click
+		function EditCanOTP()
+	   {
+			// Cancel OTP
+						$('#my_submit').attr('disabled', true);
+						//$('#regotp').attr('disabled', true);
+						//$('#Edit').attr('disabled', true);
+						$('#regotp').addClass('disabledAnchor');
+					    $('#Edit').addClass('disabledAnchor');
+						$('#loader').html('Pending...');
+				        var sendxdc = document.getElementById('sendxdc').innerHTML.trim();
+					    var ReceiverAccount = document.getElementById('ReceiverAccount').innerHTML.trim();
+						var redURL = window.location.protocol + "//" + window.location.host;
+						
+						axios.post('/api/cancelotp', {
+							address: '<%=session.public%>',
+							email: '<%=session.email%>',     
+							xdc: sendxdc,
+							account: ReceiverAccount,
+							})
+							.then(function (response,res) {
+								if(response.data.status == 'SUCCESS')
+								{
+									 $('#loader').html('');
+									 var redURL = window.location.protocol + "//" + window.location.host;
+							         window.location.replace(redURL + '/send-xdc?xdc=' + sendxdc + '&account=' + ReceiverAccount);
+									
+								}
+								if(response.data.status == 'FAILED')
+								{						
+									$('#loader').html(response.data.message);
+									$('#my_submit').removeAttr('disabled');
+							       // $('#regotp').removeAttr('disabled');
+									//$('#Edit').removeAttr('disabled');
+									$('#regotp').addClass('enabledAnchor');
+					    			$('#Edit').addClass('enabledAnchor');
+								}
+								
+							});	
+							
+						// Cancel OTP
+	   } 
+
+		load_transaction = function(){
+			axios.get('/api/transactions').then(function (response){
+				if(response.data.data.length > 0){
+				html = `<h3>Transaction Successful</h3><p style="word-wrap:break-word;">Your Transaction ID is <br><br>${response.data.data[0].tx}`;
+					$('.login-block').html(html);
+				}
+			});
+		}
+
+		balance();
+		getotp();
+	</script>
+	
+
+<% include ./partials/footer %>

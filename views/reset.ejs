@@ -1,0 +1,78 @@
+<% include ./partials/header %>
+
+	<div class="wrap">
+		<div class="header">
+			<div class="header_top">
+
+				<div class="menu">
+					<a class="toggleMenu" href="#"><img src="/images/nav.png" alt="" />
+					</a>
+					<ul class="nav">
+						<li><a href="/"><i><img src="/images/home.png" alt="" /></i>Home</a>
+						</li>
+						<li><a href="/signin"><i><img src="/images/lock.png" alt="" /></i>Sign In</a>
+						</li>
+						<li><a href="/contact-us"><i><img src="/images/contact.png" alt="" /></i>Contact Us</a>
+						</li>
+						<div class="clear"></div>
+					</ul>
+					<script type="text/javascript" src="/js/responsive-nav.js"></script>
+				</div>
+
+
+				<div class="clear"></div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="main">
+		<div class="wrap">
+
+			<div class="middleCol mt-60">
+
+				<div class="column_right_grid">
+					<div class="login-block">
+						<h3>Reset Password</h3>
+						<form id="signUp-form" name="signin-form" class="signUp-form mt-30">
+							<input type="password" value="" placeholder="New Password" name="password" />
+							<input type="password" value="" placeholder="Confirm Password" name="confirm" />
+							<input type="submit" id="my_submit" class="" value="Sign In" />
+						</form>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<script src="https://npmcdn.com/axios/dist/axios.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			$('#signUp-form').on('submit', function(e) {
+				e.preventDefault();
+				password = $('[name=password]').val();
+				confir = $('[name=confirm]').val();
+				if(password == confir) {
+					console.log(password)
+					axios.post('/api/reset', {
+						password: password,
+						reset_code: '<%=reset_code%>'
+					})
+					.then(function (response) {
+						if(response.data.status == 'SUCCESS') {
+							$('.login-block').html(`${response.data.message}`);
+						} else {
+							$('.login-block').html(`${response.data.message}`);
+						}
+					})
+				} else {
+					alert('Confirm Password doesn\'t match');
+				}
+			})
+		});
+	</script>
+
+<% include ./partials/footer %>
